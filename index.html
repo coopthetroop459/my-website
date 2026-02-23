@@ -903,12 +903,17 @@
   </div><!-- end main-content -->
 </div><!-- end app -->
 
-<script>
-// ════════════════════════════════════════
-//  CONFIG - Set your API keys here OR in Settings page
-// ════════════════════════════════════════
-let GROQ_KEY = localStorage.getItem('groq_key') || 'YOUR_GROQ_API_KEY';
-let STABILITY_KEY = localStorage.getItem('stability_key') || 'YOUR_STABILITY_API_KEY';
+// WRONG - placeholder still there
+let GROQ_KEY = 'YOUR_GROQ_API_KEY';
+
+// WRONG - extra space
+let GROQ_KEY = ' gsk_abc123';
+
+// WRONG - missing the gsk_ part
+let GROQ_KEY = 'abc123';
+
+// CORRECT
+let GROQ_KEY = 'gsk_abc123def456ghi789';
 
 // ════════════════════════════════════════
 //  AUTH SYSTEM (uses localStorage - works offline, no server needed)
