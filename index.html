@@ -1,297 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My AI Assistant</title>
+  <title>My AI Studio</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      background: linear-gradient(135deg, #0d0d1a, #1a0533, #0d1a33);
+      min-height: 100vh;
+      color: white;
+    }
+
+    /* ── AUTH SCREEN ── */
+    .auth-screen {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 750px;
+    .auth-box {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
     }
 
-    /* Header */
-    .header {
-      background: linear-gradient(90deg, #e94560, #0f3460);
-      padding: 20px 25px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
+    .auth-logo {
+      text-align: center;
+      font-size: 48px;
+      margin-bottom: 10px;
     }
 
-    .header-avatar {
-      width: 45px;
-      height: 45px;
-      background: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
+    .auth-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      background: linear-gradient(90deg, #e94560, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .header-info h2 {
-      color: white;
-      font-size: 18px;
-    }
-
-    .header-info p {
-      color: rgba(255,255,255,0.7);
+    .auth-sub {
+      text-align: center;
+      color: rgba(255,255,255,0.5);
       font-size: 13px;
+      margin-bottom: 30px;
     }
 
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #4ade80;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 5px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* Chat Box */
-    .chat-box {
-      height: 420px;
-      overflow-y: auto;
-      padding: 20px;
+    .auth-tabs {
       display: flex;
-      flex-direction: column;
-      gap: 15px;
-      scroll-behavior: smooth;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 25px;
     }
 
-    .chat-box::-webkit-scrollbar { width: 5px; }
-    .chat-box::-webkit-scrollbar-track { background: transparent; }
-    .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
-
-    .message {
-      display: flex;
-      gap: 10px;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user { flex-direction: row-reverse; }
-
-    .message-avatar {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .message.ai .message-avatar { background: linear-gradient(135deg, #e94560, #0f3460); }
-    .message.user .message-avatar { background: linear-gradient(135deg, #4ade80, #06b6d4); }
-
-    .message-content {
-      max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: white;
-    }
-
-    .message.ai .message-content {
-      background: rgba(255,255,255,0.1);
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.user .message-content {
-      background: linear-gradient(135deg, #e94560, #c2185b);
-      border-bottom-right-radius: 4px;
-    }
-
-    .message-content img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-top: 8px;
-    }
-
-    .typing-indicator {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 18px;
-      border-bottom-left-radius: 4px;
-      width: fit-content;
-    }
-
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: rgba(255,255,255,0.6);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite;
-    }
-
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-8px); }
-    }
-
-    /* Image Preview */
-    .image-preview {
-      padding: 0 20px 10px;
-      display: none;
-    }
-
-    .image-preview img {
-      height: 70px;
-      border-radius: 10px;
-      border: 2px solid #e94560;
-    }
-
-    .image-preview button {
-      background: #e94560;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 25px;
-      height: 25px;
-      cursor: pointer;
-      margin-left: 8px;
-      font-size: 14px;
-      vertical-align: top;
-    }
-
-    /* Input Area */
-    .input-area {
-      padding: 15px 20px 20px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-
-    .input-box {
+    .auth-tab {
       flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      transition: all 0.3s;
+      border: none;
+      background: transparent;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(135deg, #e94560, #a855f7);
+      color: white;
+      font-weight: 600;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 15px;
+      border-radius: 12px;
       padding: 12px 15px;
       color: white;
       font-size: 14px;
-      resize: none;
       outline: none;
-      min-height: 48px;
-      max-height: 120px;
-      font-family: inherit;
+      transition: border-color 0.3s;
     }
 
-    .input-box::placeholder { color: rgba(255,255,255,0.4); }
-    .input-box:focus { border-color: #e94560; }
+    .form-input:focus { border-color: #e94560; }
+    .form-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    .icon-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #e94560, #a855f7);
       border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-      flex-shrink: 0;
+      margin-top: 5px;
+      transition: opacity 0.2s;
     }
 
-    .icon-btn:hover { transform: scale(1.1); }
+    .auth-btn:hover { opacity: 0.9; }
 
-    .photo-btn {
+    .divider {
+      text-align: center;
+      color: rgba(255,255,255,0.3);
+      font-size: 13px;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
       background: rgba(255,255,255,0.1);
-      color: white;
     }
 
-    .send-btn {
-      background: linear-gradient(135deg, #e94560, #c2185b);
-      color: white;
-    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
 
-    .send-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Toolbar */
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-
-    .tool-chip {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
+    .guest-btn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
       color: rgba(255,255,255,0.7);
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 12px;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .tool-chip:hover {
-      background: #e94560;
-      border-color: #e94560;
+    .guest-btn:hover {
+      background: rgba(255,255,255,0.05);
       color: white;
     }
 
-    /* Mode selector */
+    .auth-msg {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .auth-msg.error { color: #ff6b6b; }
+    .auth-msg.success { color: #4ade80; }
+
+    /* ── MAIN APP ── */
+    .app { display: none; flex-direction: column; height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: 260px;
+      height: 100vh;
+      background: rgba(0,0,0,0.4);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e94560, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .user-info span { display: block; }
+    .user-name { font-size: 14px; font-weight: 600; }
+    .user-plan { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(233,69,96,0.15);
+      color: white;
+    }
+
+    .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+    .sidebar-footer { margin-top: auto; }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.1);
+      border: none;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover { background: rgba(255,107,107,0.2); }
+
+    /* Top Bar */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 15px;
+      z-index: 99;
+      backdrop-filter: blur(20px);
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #e94560, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-top: 60px;
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Pages */
+    .page { display: none; width: 100%; max-width: 800px; }
+    .page.active { display: block; }
+
+    /* Chat Page */
+    .chat-container {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      height: calc(100vh - 100px);
+      display: flex;
+      flex-direction: column;
+    }
+
     .mode-bar {
       display: flex;
       gap: 8px;
-      padding: 12px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       overflow-x: auto;
+      flex-shrink: 0;
     }
 
     .mode-btn {
       background: transparent;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.15);
       color: rgba(255,255,255,0.6);
       border-radius: 20px;
       padding: 6px 14px;
@@ -307,230 +345,916 @@
       color: white;
     }
 
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-box::-webkit-scrollbar { width: 4px; }
+    .chat-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    .message { display: flex; gap: 10px; animation: fadeIn 0.3s ease; }
+    .message.user { flex-direction: row-reverse; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+
+    .message.ai .msg-avatar { background: linear-gradient(135deg, #e94560, #a855f7); }
+    .message.user .msg-avatar { background: linear-gradient(135deg, #06b6d4, #4ade80); }
+
+    .msg-content {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .message.ai .msg-content {
+      background: rgba(255,255,255,0.08);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user .msg-content {
+      background: linear-gradient(135deg, #e94560, #c2185b);
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-content img { max-width: 100%; border-radius: 10px; margin-top: 8px; }
+
+    .typing-indicator {
+      display: flex; gap: 5px; align-items: center;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 18px; border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .typing-indicator span {
+      width: 7px; height: 7px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-7px); }
+    }
+
+    .image-preview-bar {
+      padding: 8px 15px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .image-preview-bar img {
+      height: 55px; border-radius: 8px;
+      border: 2px solid #e94560;
+    }
+
+    .remove-img-btn {
+      background: #e94560; color: white;
+      border: none; border-radius: 50%;
+      width: 22px; height: 22px;
+      cursor: pointer; font-size: 12px;
+    }
+
+    .chat-input-area {
+      padding: 12px 15px 15px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+
+    .quick-tools {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+    }
+
+    .tool-chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tool-chip:hover { background: #e94560; border-color: #e94560; color: white; }
+
+    .input-row { display: flex; gap: 8px; align-items: flex-end; }
+
+    .chat-textarea {
+      flex: 1;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 11px 14px;
+      color: white;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 46px;
+      max-height: 120px;
+      font-family: inherit;
+    }
+
+    .chat-textarea:focus { border-color: #e94560; }
+    .chat-textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+    .icon-btn {
+      width: 44px; height: 44px;
+      border-radius: 12px; border: none;
+      cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+
+    .icon-btn:hover { transform: scale(1.1); }
+    .photo-btn { background: rgba(255,255,255,0.08); color: white; }
+    .send-btn { background: linear-gradient(135deg, #e94560, #a855f7); color: white; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
     #fileInput { display: none; }
 
-    .error-msg {
-      color: #ff6b6b;
+    /* Image Generator Page */
+    .gen-page { padding: 10px 0; }
+    .gen-page h2 { font-size: 22px; margin-bottom: 5px; }
+    .gen-page p { color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 25px; }
+
+    .gen-form {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .gen-form label { font-size: 13px; color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px; }
+
+    .gen-textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 12px;
+      color: white;
+      font-size: 14px;
+      resize: none;
+      height: 90px;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 15px;
+    }
+
+    .gen-textarea:focus { border-color: #a855f7; }
+    .gen-textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+    .style-grid {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+
+    .style-chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .style-chip.selected { background: #a855f7; border-color: #a855f7; color: white; }
+
+    .gen-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      border: none; border-radius: 12px;
+      color: white; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+
+    .gen-btn:hover { opacity: 0.9; }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .gen-result {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      display: none;
+    }
+
+    .gen-result img {
+      max-width: 100%; border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 25px;
+      background: linear-gradient(135deg, #4ade80, #06b6d4);
+      border: none; border-radius: 10px;
+      color: white; font-size: 14px;
+      cursor: pointer; text-decoration: none;
+    }
+
+    /* History Page */
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .history-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .history-card:hover { transform: scale(1.02); }
+    .history-card img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+    .history-card-info { padding: 10px; }
+    .history-card-info p { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+    /* Settings page */
+    .settings-section {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    .settings-section h3 { font-size: 15px; margin-bottom: 15px; color: rgba(255,255,255,0.8); }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { color: rgba(255,255,255,0.7); }
+
+    .setting-input {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: white;
       font-size: 13px;
-      padding: 8px 12px;
-      background: rgba(255,107,107,0.1);
-      border-radius: 10px;
+      outline: none;
+      width: 200px;
+    }
+
+    .save-settings-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #e94560, #a855f7);
+      border: none; border-radius: 12px;
+      color: white; font-size: 14px; font-weight: 600;
+      cursor: pointer; margin-top: 10px;
+    }
+
+    /* Misc */
+    .page-title { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+    .page-sub { color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 20px; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      background: rgba(74,222,128,0.15);
+      color: #4ade80;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+
+    .overlay.open { display: block; }
+
+    @media (max-width: 600px) {
+      .msg-content { max-width: 85%; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
+<!-- ═══════════════════ AUTH SCREEN ═══════════════════ -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">🤖</div>
+    <div class="auth-title">AI Studio</div>
+    <div class="auth-sub">Chat, create images, and more</div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-avatar">🤖</div>
-    <div class="header-info">
-      <h2>My AI Assistant</h2>
-      <p><span class="status-dot"></span>Online and ready</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
     </div>
-  </div>
 
-  <!-- Mode Selector -->
-  <div class="mode-bar">
-    <button class="mode-btn active" onclick="setMode(this, '')">💬 Chat</button>
-    <button class="mode-btn" onclick="setMode(this, 'You are a coding expert. Help with code and explain clearly.')">💻 Code Helper</button>
-    <button class="mode-btn" onclick="setMode(this, 'You are a creative writer. Help write stories, poems, and creative content.')">✍️ Writer</button>
-    <button class="mode-btn" onclick="setMode(this, 'You are a teacher. Explain things simply like the user is a beginner.')">📚 Tutor</button>
-    <button class="mode-btn" onclick="setMode(this, 'You are a funny comedian. Be witty and humorous in all responses.')">😂 Fun Mode</button>
-  </div>
-
-  <!-- Chat Messages -->
-  <div class="chat-box" id="chatBox">
-    <div class="message ai">
-      <div class="message-avatar">🤖</div>
-      <div class="message-content">
-        Hey there! I am your AI assistant. You can chat with me, upload photos, or pick a mode above. How can I help you today?
+    <!-- Login Form -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="you@email.com"/>
       </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="Your password"/>
+      </div>
+      <button class="auth-btn" onclick="login()">Sign In</button>
     </div>
-  </div>
 
-  <!-- Image Preview -->
-  <div class="image-preview" id="imagePreview">
-    <img id="previewImg" src="" alt="preview" />
-    <button onclick="removeImage()">✕</button>
-  </div>
-
-  <!-- Input Area -->
-  <div class="input-area">
-    <div class="toolbar">
-      <span class="tool-chip" onclick="quickPrompt('Summarize this for me: ')">📋 Summarize</span>
-      <span class="tool-chip" onclick="quickPrompt('Translate this to Spanish: ')">🌍 Translate</span>
-      <span class="tool-chip" onclick="quickPrompt('Fix the grammar in this: ')">✅ Fix Grammar</span>
-      <span class="tool-chip" onclick="quickPrompt('Write a short poem about: ')">🎵 Poem</span>
-      <span class="tool-chip" onclick="clearChat()">🗑️ Clear Chat</span>
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input class="form-input" type="text" id="signupName" placeholder="John Doe"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input class="form-input" type="email" id="signupEmail" placeholder="you@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input class="form-input" type="password" id="signupPassword" placeholder="Min 6 characters"/>
+      </div>
+      <button class="auth-btn" onclick="signup()">Create Account</button>
     </div>
-    <div class="input-row">
-      <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)" />
-      <button class="icon-btn photo-btn" onclick="document.getElementById('fileInput').click()">📷</button>
-      <textarea
-        class="input-box"
-        id="userInput"
-        placeholder="Type a message..."
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
-      <button class="icon-btn send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
-    </div>
-  </div>
 
+    <div class="auth-msg" id="authMsg"></div>
+
+    <div class="divider">or</div>
+    <button class="guest-btn" onclick="continueAsGuest()">Continue as Guest</button>
+  </div>
 </div>
 
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div class="app" id="mainApp">
+
+  <!-- Overlay for sidebar -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="user-avatar" id="sidebarAvatar">?</div>
+      <div class="user-info">
+        <span class="user-name" id="sidebarName">Guest</span>
+        <span class="user-plan" id="sidebarPlan">Free Plan</span>
+      </div>
+    </div>
+
+    <button class="nav-item active" onclick="showPage('chat', this)">
+      <span class="nav-icon">💬</span> AI Chat
+    </button>
+    <button class="nav-item" onclick="showPage('imagegen', this)">
+      <span class="nav-icon">🎨</span> Image Generator
+    </button>
+    <button class="nav-item" onclick="showPage('history', this)">
+      <span class="nav-icon">🖼️</span> My Gallery
+    </button>
+    <button class="nav-item" onclick="showPage('settings', this)">
+      <span class="nav-icon">⚙️</span> Settings
+    </button>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>🚪</span> Sign Out
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title">✨ AI Studio</span>
+    <div style="margin-left:auto; font-size:13px; color:rgba(255,255,255,0.5)" id="topbarUser"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- ── CHAT PAGE ── -->
+    <div class="page active" id="page-chat">
+      <div class="chat-container">
+        <div class="mode-bar">
+          <button class="mode-btn active" onclick="setMode(this,'')">💬 Chat</button>
+          <button class="mode-btn" onclick="setMode(this,'You are a coding expert.')">💻 Code</button>
+          <button class="mode-btn" onclick="setMode(this,'You are a creative writer.')">✍️ Write</button>
+          <button class="mode-btn" onclick="setMode(this,'Explain simply like teaching a beginner.')">📚 Tutor</button>
+          <button class="mode-btn" onclick="setMode(this,'Be funny and witty in all responses.')">😂 Fun</button>
+          <button class="mode-btn" onclick="setMode(this,'You are a business consultant giving professional advice.')">💼 Business</button>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+          <div class="message ai">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-content">
+              Hey! I am your AI assistant. Chat with me, upload photos, generate images, and more. What would you like to do?
+            </div>
+          </div>
+        </div>
+
+        <div class="image-preview-bar" id="imagePreviewBar">
+          <img id="previewImg" src="" alt="preview"/>
+          <button class="remove-img-btn" onclick="removeImage()">✕</button>
+          <span style="font-size:12px;color:rgba(255,255,255,0.5)">Image attached</span>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="quick-tools">
+            <span class="tool-chip" onclick="quickPrompt('Summarize this: ')">📋 Summarize</span>
+            <span class="tool-chip" onclick="quickPrompt('Translate to Spanish: ')">🌍 Translate</span>
+            <span class="tool-chip" onclick="quickPrompt('Fix grammar: ')">✅ Grammar</span>
+            <span class="tool-chip" onclick="quickPrompt('Write a poem about: ')">🎵 Poem</span>
+            <span class="tool-chip" onclick="quickPrompt('Give me ideas for: ')">💡 Ideas</span>
+            <span class="tool-chip" onclick="clearChat()">🗑️ Clear</span>
+          </div>
+          <div class="input-row">
+            <input type="file" id="fileInput" accept="image/*" onchange="handleImage(event)"/>
+            <button class="icon-btn photo-btn" onclick="document.getElementById('fileInput').click()" title="Upload photo">📷</button>
+            <textarea
+              class="chat-textarea"
+              id="userInput"
+              placeholder="Type a message... (Enter to send)"
+              rows="1"
+              onkeydown="handleKey(event)"
+              oninput="autoResize(this)"
+            ></textarea>
+            <button class="icon-btn send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── IMAGE GENERATOR PAGE ── -->
+    <div class="page" id="page-imagegen">
+      <div class="gen-page">
+        <div class="page-title">🎨 Image Generator</div>
+        <div class="page-sub">Describe what you want and AI will create it</div>
+
+        <div class="gen-form">
+          <label>Describe your image</label>
+          <textarea class="gen-textarea" id="imagePrompt" placeholder="A futuristic city at sunset with flying cars and neon lights..."></textarea>
+
+          <label>Style</label>
+          <div class="style-grid" id="styleGrid">
+            <span class="style-chip selected" onclick="selectStyle(this)">🖼️ Realistic</span>
+            <span class="style-chip" onclick="selectStyle(this)">🎨 Oil Painting</span>
+            <span class="style-chip" onclick="selectStyle(this)">✏️ Sketch</span>
+            <span class="style-chip" onclick="selectStyle(this)">🌸 Anime</span>
+            <span class="style-chip" onclick="selectStyle(this)">🔮 Fantasy</span>
+            <span class="style-chip" onclick="selectStyle(this)">📸 Photography</span>
+            <span class="style-chip" onclick="selectStyle(this)">🎮 Pixel Art</span>
+            <span class="style-chip" onclick="selectStyle(this)">🌈 Watercolor</span>
+          </div>
+
+          <button class="gen-btn" id="genBtn" onclick="generateImage()">✨ Generate Image</button>
+        </div>
+
+        <div class="gen-result" id="genResult">
+          <img id="generatedImg" src="" alt="Generated image"/>
+          <br/>
+          <a class="download-btn" id="downloadBtn" download="ai-image.png">⬇️ Download Image</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GALLERY PAGE ── -->
+    <div class="page" id="page-history">
+      <div class="page-title">🖼️ My Gallery</div>
+      <div class="page-sub">Your generated images are saved here</div>
+      <div class="history-grid" id="galleryGrid">
+        <div style="color:rgba(255,255,255,0.3); font-size:14px; grid-column:1/-1; text-align:center; padding:40px 0;">
+          No images yet. Go to Image Generator to create some!
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS PAGE ── -->
+    <div class="page" id="page-settings">
+      <div class="page-title">⚙️ Settings</div>
+      <div class="page-sub">Configure your API keys and preferences</div>
+
+      <div class="settings-section">
+        <h3>🔑 API Keys</h3>
+        <div class="setting-row">
+          <span class="setting-label">Groq API Key (for chat)</span>
+          <input class="setting-input" type="password" id="settingGroqKey" placeholder="gsk_..."/>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Stability AI Key (for images)</span>
+          <input class="setting-input" type="password" id="settingStabilityKey" placeholder="sk-..."/>
+        </div>
+        <button class="save-settings-btn" onclick="saveSettings()">💾 Save Keys</button>
+      </div>
+
+      <div class="settings-section">
+        <h3>👤 Account</h3>
+        <div class="setting-row">
+          <span class="setting-label">Logged in as</span>
+          <span id="settingUser" style="color:rgba(255,255,255,0.6); font-size:14px;">Guest</span>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Plan</span>
+          <span class="status-badge">Free</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end app -->
+
 <script>
-  // =====================
-  // PASTE YOUR GROQ API KEY BELOW
-  const API_KEY = 'YOUR_GROQ_API_KEY';
-  // =====================
+// ════════════════════════════════════════
+//  CONFIG - Set your API keys here OR in Settings page
+// ════════════════════════════════════════
+let GROQ_KEY = localStorage.getItem('groq_key') || 'YOUR_GROQ_API_KEY';
+let STABILITY_KEY = localStorage.getItem('stability_key') || 'YOUR_STABILITY_API_KEY';
 
-  let systemPrompt = 'You are a helpful AI assistant. Keep answers clear and friendly.';
-  let chatHistory = [];
-  let selectedImage = null;
+// ════════════════════════════════════════
+//  AUTH SYSTEM (uses localStorage - works offline, no server needed)
+// ════════════════════════════════════════
+let currentUser = null;
+let chatHistory = [];
+let systemPrompt = 'You are a helpful AI assistant. Be clear and friendly.';
+let selectedImage = null;
+let selectedStyle = 'Realistic';
+let savedImages = JSON.parse(localStorage.getItem('gallery') || '[]');
 
-  function setMode(btn, prompt) {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    systemPrompt = prompt || 'You are a helpful AI assistant. Keep answers clear and friendly.';
-    addMessage('ai', 'Mode changed! I am ready in ' + btn.innerText + ' mode.');
-  }
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1));
+  });
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('authMsg').textContent = '';
+}
 
-  function quickPrompt(text) {
-    document.getElementById('userInput').value = text;
-    document.getElementById('userInput').focus();
-  }
+function showAuthMsg(msg, type) {
+  const el = document.getElementById('authMsg');
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type;
+}
 
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+function signup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!name || !email || !password) return showAuthMsg('Please fill in all fields.', 'error');
+  if (password.length < 6) return showAuthMsg('Password must be at least 6 characters.', 'error');
+
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  if (users[email]) return showAuthMsg('An account with this email already exists.', 'error');
+
+  users[email] = { name, email, password, created: new Date().toISOString() };
+  localStorage.setItem('users', JSON.stringify(users));
+  showAuthMsg('Account created! Signing you in...', 'success');
+  setTimeout(() => loginUser({ name, email }), 1000);
+}
+
+function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) return showAuthMsg('Please enter email and password.', 'error');
+
+  const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const user = users[email];
+
+  if (!user || user.password !== password) return showAuthMsg('Incorrect email or password.', 'error');
+  loginUser(user);
+}
+
+function continueAsGuest() {
+  loginUser({ name: 'Guest', email: 'guest' });
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+
+  const initial = user.name.charAt(0).toUpperCase();
+  document.getElementById('sidebarAvatar').textContent = initial;
+  document.getElementById('sidebarName').textContent = user.name;
+  document.getElementById('sidebarPlan').textContent = user.email === 'guest' ? 'Guest Mode' : 'Free Plan';
+  document.getElementById('topbarUser').textContent = user.name;
+  document.getElementById('settingUser').textContent = user.email === 'guest' ? 'Guest' : user.email;
+
+  loadSettings();
+  loadGallery();
+}
+
+function logout() {
+  localStorage.removeItem('currentUser');
+  currentUser = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+  closeSidebar();
+}
+
+// Auto login if session exists
+window.onload = () => {
+  const saved = localStorage.getItem('currentUser');
+  if (saved) loginUser(JSON.parse(saved));
+};
+
+// ════════════════════════════════════════
+//  SIDEBAR
+// ════════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  closeSidebar();
+}
+
+// ════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════
+function saveSettings() {
+  const gk = document.getElementById('settingGroqKey').value.trim();
+  const sk = document.getElementById('settingStabilityKey').value.trim();
+  if (gk) { GROQ_KEY = gk; localStorage.setItem('groq_key', gk); }
+  if (sk) { STABILITY_KEY = sk; localStorage.setItem('stability_key', sk); }
+  alert('Keys saved!');
+}
+
+function loadSettings() {
+  const gk = localStorage.getItem('groq_key');
+  const sk = localStorage.getItem('stability_key');
+  if (gk) { document.getElementById('settingGroqKey').value = gk; GROQ_KEY = gk; }
+  if (sk) { document.getElementById('settingStabilityKey').value = sk; STABILITY_KEY = sk; }
+}
+
+// ════════════════════════════════════════
+//  CHAT
+// ════════════════════════════════════════
+function setMode(btn, prompt) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  systemPrompt = prompt || 'You are a helpful AI assistant. Be clear and friendly.';
+  addMessage('ai', 'Switched to ' + btn.innerText + ' mode!');
+}
+
+function quickPrompt(text) {
+  document.getElementById('userInput').value = text;
+  document.getElementById('userInput').focus();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    selectedImage = ev.target.result;
+    document.getElementById('previewImg').src = selectedImage;
+    document.getElementById('imagePreviewBar').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  selectedImage = null;
+  document.getElementById('imagePreviewBar').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chatBox').innerHTML = `
+    <div class="message ai">
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-content">Chat cleared! Start fresh.</div>
+    </div>`;
+}
+
+function addMessage(role, text, imgSrc = null) {
+  const chatBox = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'message ' + role;
+  div.innerHTML = `
+    <div class="msg-avatar">${role === 'ai' ? '🤖' : '🧑'}</div>
+    <div class="msg-content">
+      ${text}
+      ${imgSrc ? `<img src="${imgSrc}" alt="uploaded"/>` : ''}
+    </div>`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function showTyping() {
+  const chatBox = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'message ai';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div class="typing-indicator"><span></span><span></span><span></span></div>`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const question = input.value.trim();
+  if (!question && !selectedImage) return;
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+
+  addMessage('user', question || '(image sent)', selectedImage);
+  const imgToSend = selectedImage;
+  removeImage();
+  input.value = '';
+  input.style.height = 'auto';
+
+  chatHistory.push({ role: 'user', content: question || 'What is in this image?' });
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + GROQ_KEY
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...chatHistory
+        ]
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.choices) {
+      const reply = data.choices[0].message.content;
+      chatHistory.push({ role: 'assistant', content: reply });
+      addMessage('ai', reply);
+    } else {
+      addMessage('ai', '⚠️ Error: ' + (data.error?.message || 'Something went wrong. Check your API key in Settings.'));
     }
+  } catch (err) {
+    removeTyping();
+    addMessage('ai', '⚠️ Connection error: ' + err.message);
   }
 
-  function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
+  btn.disabled = false;
+  input.focus();
+}
 
-  function handleImage(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      selectedImage = e.target.result;
-      document.getElementById('previewImg').src = selectedImage;
-      document.getElementById('imagePreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
+// ════════════════════════════════════════
+//  IMAGE GENERATOR
+// ════════════════════════════════════════
+function selectStyle(el) {
+  document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedStyle = el.innerText.replace(/[^\w\s]/g, '').trim();
+}
 
-  function removeImage() {
-    selectedImage = null;
-    document.getElementById('imagePreview').style.display = 'none';
-    document.getElementById('fileInput').value = '';
-  }
+async function generateImage() {
+  const prompt = document.getElementById('imagePrompt').value.trim();
+  if (!prompt) return alert('Please describe what you want to generate!');
 
-  function clearChat() {
-    chatHistory = [];
-    document.getElementById('chatBox').innerHTML = `
-      <div class="message ai">
-        <div class="message-avatar">🤖</div>
-        <div class="message-content">Chat cleared! Start a new conversation.</div>
-      </div>`;
-  }
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
 
-  function addMessage(role, text, imgSrc = null) {
-    const chatBox = document.getElementById('chatBox');
-    const div = document.createElement('div');
-    div.className = 'message ' + role;
-    div.innerHTML = `
-      <div class="message-avatar">${role === 'ai' ? '🤖' : '🧑'}</div>
-      <div class="message-content">
-        ${text}
-        ${imgSrc ? `<img src="${imgSrc}" alt="uploaded image"/>` : ''}
-      </div>`;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+  const fullPrompt = prompt + ', style: ' + selectedStyle + ', high quality, detailed';
 
-  function showTyping() {
-    const chatBox = document.getElementById('chatBox');
-    const div = document.createElement('div');
-    div.className = 'message ai';
-    div.id = 'typingIndicator';
-    div.innerHTML = `
-      <div class="message-avatar">🤖</div>
-      <div class="typing-indicator">
-        <span></span><span></span><span></span>
-      </div>`;
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
+  try {
+    const res = await fetch('https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + STABILITY_KEY
+      },
+      body: JSON.stringify({
+        text_prompts: [{ text: fullPrompt, weight: 1 }],
+        cfg_scale: 7,
+        height: 1024,
+        width: 1024,
+        steps: 30,
+        samples: 1
+      })
+    });
 
-  function removeTyping() {
-    const el = document.getElementById('typingIndicator');
-    if (el) el.remove();
-  }
+    const data = await res.json();
 
-  async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const question = input.value.trim();
-    if (!question && !selectedImage) return;
-
-    const sendBtn = document.getElementById('sendBtn');
-    sendBtn.disabled = true;
-
-    // Show user message
-    addMessage('user', question || '(image sent)', selectedImage);
-    const imgToSend = selectedImage;
-    removeImage();
-    input.value = '';
-    input.style.height = 'auto';
-
-    // Add to history
-    chatHistory.push({ role: 'user', content: question || 'Describe this image.' });
-
-    showTyping();
-
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + API_KEY
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...chatHistory
-          ]
-        })
-      });
-
-      const data = await response.json();
-      removeTyping();
-
-      if (data.choices) {
-        const reply = data.choices[0].message.content;
-        chatHistory.push({ role: 'assistant', content: reply });
-        addMessage('ai', reply);
-      } else {
-        addMessage('ai', '<span class="error-msg">Error: ' + (data.error?.message || 'Something went wrong') + '</span>');
-      }
-
-    } catch (err) {
-      removeTyping();
-      addMessage('ai', '<span class="error-msg">Connection error: ' + err.message + '</span>');
+    if (data.artifacts && data.artifacts[0]) {
+      const imgData = 'data:image/png;base64,' + data.artifacts[0].base64;
+      document.getElementById('generatedImg').src = imgData;
+      document.getElementById('downloadBtn').href = imgData;
+      document.getElementById('genResult').style.display = 'block';
+      saveToGallery(imgData, prompt);
+    } else {
+      alert('Image generation failed: ' + (data.message || 'Check your Stability AI key in Settings.'));
     }
-
-    sendBtn.disabled = false;
-    input.focus();
+  } catch (err) {
+    alert('Error: ' + err.message);
   }
+
+  btn.disabled = false;
+  btn.textContent = '✨ Generate Image';
+}
+
+// ════════════════════════════════════════
+//  GALLERY
+// ════════════════════════════════════════
+function saveToGallery(imgData, prompt) {
+  savedImages.unshift({ img: imgData, prompt, date: new Date().toLocaleDateString() });
+  if (savedImages.length > 20) savedImages.pop();
+  localStorage.setItem('gallery', JSON.stringify(savedImages));
+  loadGallery();
+}
+
+function loadGallery() {
+  const grid = document.getElementById('galleryGrid');
+  if (savedImages.length === 0) {
+    grid.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:14px;grid-column:1/-1;text-align:center;padding:40px 0;">No images yet. Go to Image Generator to create some!</div>';
+    return;
+  }
+  grid.innerHTML = savedImages.map(item => `
+    <div class="history-card">
+      <img src="${item.img}" alt="generated"/>
+      <div class="history-card-info">
+        <p>${item.prompt.substring(0, 50)}${item.prompt.length > 50 ? '...' : ''}</p>
+        <p style="margin-top:4px">${item.date}</p>
+      </div>
+    </div>
+  `).join('');
+}
 </script>
 </body>
 </html>
