@@ -1551,22 +1551,20 @@ async function sendMsg() {
 
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
-      },
-      body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
-',
-',
-        messages: [
-          {role:'system', content: systemPrompt},
-          ...chatHistory
-        ],
-        temperature: 0.7
-      })
-    });
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + GROQ_KEY
+  },
+  body: JSON.stringify({
+    model: 'llama-3.1-8b-instant',
+    messages: [
+      {role:'system', content: systemPrompt},
+      ...chatHistory
+    ],
+    temperature: 0.7
+  })
+});
 
     const data = await res.json();
     removeTyping();
