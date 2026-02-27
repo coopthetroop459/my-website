@@ -17,8 +17,8 @@
       --text: #ececec;
       --muted: rgba(255,255,255,0.4);
       --input-bg: #2f2f2f;
-      --bubble-ai: #2f2f2f;
-      --bubble-user: #c96442;
+      --code-bg: #1a1a1a;
+      --code-border: rgba(255,255,255,0.15);
     }
 
     body {
@@ -502,25 +502,122 @@
 
     .msg-bubble {
       max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 16px;
+      padding: 12px 0;
       font-size: 14px;
       line-height: 1.7;
     }
 
     .msg-row.ai .msg-bubble {
-      background: transparent;
-      padding-left: 0;
       color: var(--text);
     }
 
     .msg-row.user .msg-bubble {
       background: var(--surface);
       border: 1px solid var(--border);
+      border-radius: 16px;
       border-bottom-right-radius: 4px;
+      padding: 12px 16px;
     }
 
     .msg-bubble img { max-width: 100%; border-radius: 10px; margin-top: 8px; }
+
+    /* Markdown-style formatting in messages */
+    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 14px 0 8px 0;
+      color: var(--text);
+    }
+
+    .msg-bubble h1:first-child, .msg-bubble h2:first-child, .msg-bubble h3:first-child { margin-top: 0; }
+
+    .msg-bubble p { margin: 8px 0; }
+
+    .msg-bubble ul, .msg-bubble ol {
+      margin: 8px 0;
+      padding-left: 24px;
+    }
+
+    .msg-bubble li {
+      margin: 5px 0;
+      line-height: 1.6;
+    }
+
+    .msg-bubble code {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      color: #e9c46a;
+    }
+
+    .msg-bubble pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .msg-bubble pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #a8dadc;
+      display: block;
+      line-height: 1.5;
+    }
+
+    .msg-bubble table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    .msg-bubble table th, .msg-bubble table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .msg-bubble table th {
+      background: var(--surface);
+      font-weight: 600;
+    }
+
+    .msg-bubble blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      margin: 10px 0;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .msg-bubble hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    .msg-bubble strong { font-weight: 700; color: var(--text); }
+    .msg-bubble em { font-style: italic; }
+
+    .math-block {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
+      padding: 14px;
+      margin: 10px 0;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      color: #a8dadc;
+    }
 
     .typing-row { padding: 6px 0; }
 
@@ -1023,11 +1120,12 @@
     <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <select class="mode-select" id="modeSelect" onchange="changeMode()">
       <option value="">💬 Chat</option>
-      <option value="You are a coding expert. Help with code problems clearly.">💻 Code Helper</option>
-      <option value="You are a creative writer. Help write stories, poems, scripts.">✍️ Creative Writer</option>
-      <option value="Explain everything simply as if teaching a complete beginner.">📚 Tutor</option>
-      <option value="You are a business consultant. Give professional strategic advice.">💼 Business</option>
-      <option value="Be funny, witty and entertaining in all your responses.">😂 Fun Mode</option>
+      <option value="math">🔢 Math Expert</option>
+      <option value="code">💻 Code Helper</option>
+      <option value="write">✍️ Creative Writer</option>
+      <option value="tutor">📚 Tutor</option>
+      <option value="business">💼 Business</option>
+      <option value="fun">😂 Fun Mode</option>
     </select>
   </div>
 
@@ -1037,23 +1135,23 @@
     <div class="chat-welcome" id="chatWelcome">
       <div class="welcome-icon">✦</div>
       <h1>What can I help with?</h1>
-      <p>Ask me anything, upload a photo, generate images, or pick a mode above to get started.</p>
+      <p>Ask me anything, solve math problems, upload photos, generate images, or pick a mode above.</p>
       <div class="suggestion-grid">
-        <div class="suggestion-card" onclick="setInput('Explain how AI works in simple terms')">
-          <strong>🧠 Explain AI</strong>
-          How does artificial intelligence actually work?
+        <div class="suggestion-card" onclick="setInput('Solve: (3x + 7)(2x - 5) = 0')">
+          <strong>🔢 Solve equation</strong>
+          Get step-by-step math solutions
         </div>
-        <div class="suggestion-card" onclick="setInput('Write a short poem about the ocean')">
-          <strong>✍️ Write a poem</strong>
-          Something beautiful about the ocean
+        <div class="suggestion-card" onclick="setInput('Explain calculus derivatives simply')">
+          <strong>📐 Learn math</strong>
+          Understand complex concepts easily
+        </div>
+        <div class="suggestion-card" onclick="setInput('Write a Python function to calculate fibonacci numbers')">
+          <strong>💻 Write code</strong>
+          Generate clean working code
         </div>
         <div class="suggestion-card" onclick="setInput('Give me 5 business ideas for 2025')">
           <strong>💡 Business ideas</strong>
-          Creative ideas I can start today
-        </div>
-        <div class="suggestion-card" onclick="setInput('Fix this code and explain what was wrong: ')">
-          <strong>💻 Debug code</strong>
-          Paste your code and I will fix it
+          Creative ideas to start today
         </div>
       </div>
     </div>
@@ -1068,11 +1166,11 @@
       </div>
 
       <div class="quick-chips">
+        <span class="chip" onclick="setInput('Solve this math problem: ')">🔢 Math</span>
+        <span class="chip" onclick="setInput('Explain this code: ')">💻 Code</span>
         <span class="chip" onclick="setInput('Summarize this: ')">📋 Summarize</span>
         <span class="chip" onclick="setInput('Translate to Spanish: ')">🌍 Translate</span>
-        <span class="chip" onclick="setInput('Fix the grammar: ')">✅ Grammar</span>
         <span class="chip" onclick="setInput('Give me ideas for: ')">💡 Ideas</span>
-        <span class="chip" onclick="setInput('Write a poem about: ')">🎵 Poem</span>
         <span class="chip" onclick="clearChat()">🗑️ Clear</span>
       </div>
 
@@ -1174,15 +1272,31 @@
 // ══════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════
-let GROQ_KEY = localStorage.getItem('groq_key') || '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';
+let GROQ_KEY = localStorage.getItem('groq_key') || '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';
 
 let currentUser = null;
 let chatHistory = [];
-let systemPrompt = 'You are Nova AI, a helpful and friendly assistant. Be clear, concise and conversational.';
+let systemPrompt = 'You are Nova AI, a helpful and friendly assistant. Format your responses using markdown:\n\n- Use **bold** for important points\n- Use headings (##) to organize sections\n- Use bullet points and numbered lists for clarity\n- Use code blocks with ``` for code\n- Use tables when comparing data\n- Break complex answers into clear sections\n\nBe clear, concise and well-organized.';
 let attachedImg = null;
 let chosenStyle = 'Realistic';
 let gallery = JSON.parse(localStorage.getItem('gallery') || '[]');
 let hasMessages = false;
+
+const SYSTEM_PROMPTS = {
+  '': 'You are Nova AI, a helpful and friendly assistant. Format your responses using markdown:\n\n- Use **bold** for important points\n- Use headings (##) to organize sections\n- Use bullet points and numbered lists for clarity\n- Use code blocks with ``` for code\n- Use tables when comparing data\n- Break complex answers into clear sections\n\nBe clear, concise and well-organized.',
+  
+  'math': 'You are Nova AI Math Expert. When solving math problems:\n\n1. **Show all steps** clearly\n2. Use proper mathematical notation\n3. Explain the logic behind each step\n4. Format equations clearly using markdown\n5. Verify your answer at the end\n6. Use headings to organize solution steps\n\nExample format:\n## Problem\n[state the problem]\n\n## Solution\n**Step 1:** [explanation]\n**Step 2:** [explanation]\n\n## Final Answer\n[clear final result]\n\nBe thorough but easy to follow.',
+  
+  'code': 'You are Nova AI Code Helper. When helping with code:\n\n- Format all code in ```language code blocks\n- Add clear comments\n- Explain what the code does\n- Use proper syntax and best practices\n- Organize with headings for different sections\n- Show examples of usage\n\nBe clear and practical.',
+  
+  'write': 'You are Nova AI Creative Writer. Help write stories, poems, scripts with:\n\n- Creative and engaging content\n- Proper formatting using markdown\n- Clear structure with headings\n- Rich descriptive language\n\nBe imaginative and well-organized.',
+  
+  'tutor': 'You are Nova AI Tutor. Teach concepts by:\n\n- Breaking down complex topics into simple parts\n- Using analogies and examples\n- Organizing with clear headings\n- Using bullet points for key concepts\n- Adding practice questions when helpful\n\nExplain like teaching a beginner.',
+  
+  'business': 'You are Nova AI Business Consultant. Provide:\n\n- Strategic professional advice\n- Data-driven insights using tables\n- Clear action steps with numbered lists\n- Pros and cons analysis\n- Well-organized sections with headings\n\nBe professional and structured.',
+  
+  'fun': 'You are Nova AI Fun Mode. Be:\n\n- Funny and witty\n- Entertaining and playful\n- Still organized with markdown formatting\n- Creative with emojis\n\nMake responses fun while keeping them clear!'
+};
 
 // ══════════════════════════════════════
 //  AUTH
@@ -1281,7 +1395,7 @@ function loadKeys() {
 // ══════════════════════════════════════
 function changeMode() {
   const val = document.getElementById('modeSelect').value;
-  systemPrompt = val || 'You are Nova AI, a helpful and friendly assistant. Be clear, concise and conversational.';
+  systemPrompt = SYSTEM_PROMPTS[val] || SYSTEM_PROMPTS[''];
 }
 
 function setInput(text) {
@@ -1327,6 +1441,49 @@ function newChat() {
 
 function clearChat() { newChat(); }
 
+function formatMarkdown(text) {
+  // Simple markdown parser for better formatting
+  let html = text;
+  
+  // Headers
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  
+  // Code blocks
+  html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+  
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Bold
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // Italic
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  
+  // Lists
+  html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  
+  html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+  
+  // Paragraphs
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  
+  // Clean up
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>(<h[123]>)/g, '$1');
+  html = html.replace(/(<\/h[123]>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<pre>)/g, '$1');
+  html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+  html = html.replace(/<p>(<ul>)/g, '$1');
+  html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+  
+  return html;
+}
+
 function addMsg(role, text, img=null) {
   if (!hasMessages) {
     hasMessages = true;
@@ -1336,11 +1493,14 @@ function addMsg(role, text, img=null) {
   const box = document.getElementById('chatMessages');
   const row = document.createElement('div');
   row.className = 'msg-row ' + role;
+  
+  const formattedText = role === 'ai' ? formatMarkdown(text) : text;
+  
   row.innerHTML = `
     <div class="msg-inner">
       <div class="msg-av">${role==='ai'?'✦':'🧑'}</div>
       <div class="msg-bubble">
-        ${text}
+        ${formattedText}
         ${img?`<img src="${img}" alt="uploaded"/>`:''}
       </div>
     </div>`;
@@ -1397,11 +1557,12 @@ async function sendMsg() {
         'Authorization': 'Bearer ' + GROQ_KEY
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.1-70b-versatile',
         messages: [
           {role:'system', content: systemPrompt},
           ...chatHistory
-        ]
+        ],
+        temperature: 0.7
       })
     });
 
